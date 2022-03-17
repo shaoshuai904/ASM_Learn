@@ -1,8 +1,23 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 //com.maple.lifecycle 为resources/META-INF/gradle-plugins 下的properties文件名称
 if (project.hasProperty('enableReplace')) {
     apply plugin: 'com.maple.replace'
 }
+apply plugin: 'com.maple.msplugin'
+
+//import com.maple.plugin.plugins.doubleClick.DoubleClickPlugin
+//import com.maple.plugin.plugins.legalBitmap.LegalBitmapPlugin
+//import com.maple.plugin.plugins.optimizedThread.OptimizedThreadPlugin
+//import com.maple.plugin.plugins.privacySentry.PrivacySentryPlugin
+
+//apply plugin: 'com.maple.double-click-plugin'
+//apply plugin: DoubleClickPlugin
+//apply plugin: OptimizedThreadPlugin
+//apply plugin: PrivacySentryPlugin
+//apply plugin: LegalBitmapPlugin
+
 
 android {
     compileSdk 31
@@ -33,9 +48,16 @@ android {
 }
 
 dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.3.0'
     implementation 'com.google.android.material:material:1.4.0'
+
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+//    implementation "androidx.core:core-ktx:1.6.0"
+}
+
+repositories {
+    mavenCentral()
 }
