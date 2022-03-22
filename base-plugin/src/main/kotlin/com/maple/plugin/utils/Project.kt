@@ -1,11 +1,15 @@
 package com.maple.plugin.utils
 
+import com.android.Version
 import com.android.build.gradle.BaseExtension
 import com.android.repository.Revision
 import org.gradle.api.Project
 
 val Project.gradleVersion: Revision
     get() = Revision.parseRevision(gradle.gradleVersion)
+
+val buildVersion: Revision
+    get() = Revision.parseRevision(Version.ANDROID_GRADLE_PLUGIN_VERSION)
 
 //val Project.isAapt2Enabled: Boolean
 //    get() = AGP.run { isAapt2Enabled }

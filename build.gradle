@@ -13,10 +13,9 @@ buildscript {
         if ("true" == project.findProperty('enableReplace')) {
             classpath 'com.maple.plugin:replace-plugin:0.0.1'
         }
-        classpath 'com.maple.plugin:base-plugin:0.0.1'
-//        if ("true" == project.findProperty('enablePlugin')) {
-//            classpath 'com.maple.plugin:base-plugin:0.0.1'
-//        }
+        if ("true" == project.findProperty('enableASMPlugin')) {
+            classpath 'com.maple.plugin:base-plugin:0.0.1'
+        }
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }

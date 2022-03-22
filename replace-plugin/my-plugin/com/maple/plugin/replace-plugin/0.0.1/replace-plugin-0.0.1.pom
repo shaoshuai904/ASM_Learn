@@ -5,12 +5,4 @@
   <groupId>com.maple.plugin</groupId>
   <artifactId>replace-plugin</artifactId>
   <version>0.0.1</version>
-  <dependencies>
-    <dependency>
-      <groupId>com.android.tools.build</groupId>
-      <artifactId>gradle</artifactId>
-      <version>4.1.0</version>
-      <scope>runtime</scope>
-    </dependency>
-  </dependencies>
 </project>

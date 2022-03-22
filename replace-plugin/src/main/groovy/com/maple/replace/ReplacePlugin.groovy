@@ -104,7 +104,7 @@ class ReplacePlugin extends Transform implements Plugin<Project> {
             // 列出 </app/build/intermediates/javac/debug/classes> 目录所有文件（包含子文件夹，子文件夹内文件）
             directoryInput.file.eachFileRecurse { File file ->
                 def className = file.absolutePath.substring(rootPath.length() + 1)
-                println '----debug/class: ' + className
+                // println '----debug/class: ' + className
                 if (checkClassFile(className)) {
                     // println '----需要处理class中的类：' + className
                     ClassReader classReader = new ClassReader(file.bytes)
@@ -153,7 +153,7 @@ class ReplacePlugin extends Transform implements Plugin<Project> {
                 ZipEntry zipEntry = new ZipEntry(entryName)
                 InputStream inputStream = jarFile.getInputStream(jarEntry)
                 //插桩class
-                println '----jar/class: ' + entryName
+                // println '----jar/class: ' + entryName
                 if (checkClassFile(entryName)) {
                     //class文件处理
                     //println '----需要处理Jar中的类：' + entryName

@@ -33,10 +33,12 @@ public class MainActivity extends BaseActivity {
 
     }
 
+
     public void testSendBC(Context ctx) {
         Intent intent = new Intent();
         ctx.sendBroadcast(intent);
         Log.e("ms_app","testSendBC");
+        ctx.sendBroadcast(new Intent("fadf"));
         ctx.sendBroadcast(new Intent("com.sina.weibo.intent.action.ACTION_HOME_LIST_UPDATE"));
     }
 

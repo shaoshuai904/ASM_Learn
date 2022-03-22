@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "configs": [
+    {
+      "oldOpcode": "INVOKEVIRTUAL",
+      "oldOwner": "android/content/Context",
+      "oldName": "sendBroadcast",
+      "oldDescriptor": "(Landroid/content/Intent;)V",
+      "oldIsInterface": false,
+      "newOpcode": "INVOKESTATIC",
+      "newOwner": "com/maple/asm_learn/BroadcastUtils",
+      "newName": "sendAppInsideBroadcast",
+      "newDescriptor": "(Landroid/content/Context;Landroid/content/Intent;)V",
+      "newIsInterface": false
+    }
+  ]
+}

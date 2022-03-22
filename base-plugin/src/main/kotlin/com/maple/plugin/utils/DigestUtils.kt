@@ -3,11 +3,6 @@ package com.maple.plugin.utils
 import org.apache.commons.codec.binary.Hex
 import java.io.File
 
-/**
- * @Author: leavesCZY
- * @Date: 2021/12/8 15:45
- * @Desc:
- */
 object DigestUtils {
 
     fun generateJarFileName(jarFile: File): String {

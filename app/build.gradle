@@ -5,18 +5,16 @@ apply plugin: 'kotlin-kapt'
 if (project.hasProperty('enableReplace')) {
     apply plugin: 'com.maple.replace'
 }
-apply plugin: 'com.maple.msplugin'
-
-//import com.maple.plugin.plugins.doubleClick.DoubleClickPlugin
-//import com.maple.plugin.plugins.legalBitmap.LegalBitmapPlugin
-//import com.maple.plugin.plugins.optimizedThread.OptimizedThreadPlugin
-//import com.maple.plugin.plugins.privacySentry.PrivacySentryPlugin
-
-//apply plugin: 'com.maple.double-click-plugin'
-//apply plugin: DoubleClickPlugin
-//apply plugin: OptimizedThreadPlugin
-//apply plugin: PrivacySentryPlugin
-//apply plugin: LegalBitmapPlugin
+if ("true" == project.findProperty('enableASMPlugin')) {
+    apply plugin: 'com.maple.msplugin'
+    msKitExt {
+        uuid = "ms_methodmap"
+        replace {
+            enable = true
+            configFile = "gradle/replaceConfig.json"
+        }
+    }
+}
 
 
 android {

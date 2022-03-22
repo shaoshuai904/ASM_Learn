@@ -13,58 +13,55 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.util.concurrent.Callable
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.ForkJoinPool
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
 
-/**
- * @Author: leavesCZY
- * @Date: 2021/12/8 15:19
- * @Desc:
- */
-abstract class BaseTransform protected constructor(val project: Project) : Transform() {
-//    internal open val transformers = listOf<Transformer>()
-//    private val executorService: ExecutorService = ForkJoinPool.commonPool()
-//    private val taskList = mutableListOf<Callable<Unit>>()
 
-    override fun transform(transformInvocation: TransformInvocation) {
+abstract class BaseTransform protected constructor(val project: Project) : Transform() {
+    //    internal open val transformers = listOf<Transformer>()
+//    private val executorService: ExecutorService = ForkJoinPool.commonPool()
+    private val taskList = mutableListOf<Callable<Unit>>()
+    private fun submitTask(task: () -> Unit) {
+//        taskList.add(Callable<Unit> {
+        task()
+//        })
+    }
+
+    override fun transform(invocation: TransformInvocation) {
+        val startTime = System.currentTimeMillis()
         Log.log("transform start--------------->")
         onTransformStart()
-        val startTime = System.currentTimeMillis()
-        val inputs = transformInvocation.inputs
-        val outputProvider = transformInvocation.outputProvider
-        val context = transformInvocation.context
-        val isIncremental = transformInvocation.isIncremental
+        val outputProvider = invocation.outputProvider
+        val context = invocation.context
+        val isIncremental = invocation.isIncremental && this.isIncremental
         if (!isIncremental) {
             outputProvider.deleteAll()
         }
-        inputs.forEach { input ->
+        invocation.inputs.forEach { input ->
             input.jarInputs.forEach { jarInput ->
-//                submitTask {
-                forEachJar(jarInput, outputProvider, context, isIncremental)
-//                }
+                submitTask {
+                    forEachJar(jarInput, outputProvider, context, isIncremental)
+                }
             }
             input.directoryInputs.forEach { dirInput ->
-//                submitTask {
-                forEachDirectory(dirInput, outputProvider, context, isIncremental)
-//                }
+                submitTask {
+                    forEachDirectory(dirInput, outputProvider, context, isIncremental)
+                }
             }
         }
-//        val taskListFeature = executorService.invokeAll(taskList)
-//        taskListFeature.forEach {
-//            it.get()
-//        }
+        val taskListFeature = ForkJoinPool.commonPool().invokeAll(taskList)
+        taskListFeature.forEach {
+            it.get()
+        }
         onTransformEnd()
         Log.log("transform end---------------> 耗时: " + (System.currentTimeMillis() - startTime) + " ms")
     }
 
-    protected open fun onTransformStart() {
-    }
+    protected open fun onTransformStart() {}
 
-    protected open fun onTransformEnd() {
-    }
+    protected open fun onTransformEnd() {}
 
     private fun forEachJar(
         jarInput: JarInput,
@@ -80,25 +77,24 @@ abstract class BaseTransform protected constructor(val project: Project) : Trans
             Format.JAR
         )
 
+        // 增量编译
         if (isIncremental) {
-//            when (jarInput.status) {
-//                Status.NOTCHANGED -> {
-//
-//                }
-//                Status.REMOVED -> {
-//                    Log.log("处理 jar： " + jarInput.file.name + " REMOVED")
-//                    if (destFile.exists()) {
-//                        FileUtils.forceDelete(destFile)
-//                    }
-//                    return
-//                }
-//                Status.ADDED, Status.CHANGED -> {
-//                    Log.log("处理 jar： " + jarInput.file.name + " ADDED or CHANGED")
-//                }
-//                else -> {
-//                    return
-//                }
-//            }
+            when (jarInput.status) {
+                Status.NOTCHANGED -> {}
+                Status.REMOVED -> {
+                    Log.log("增量处理 jar： " + jarInput.file.name + " remove~")
+                    if (destFile.exists()) {
+                        FileUtils.forceDelete(destFile)
+                    }
+                    return
+                }
+                Status.ADDED, Status.CHANGED -> {
+                    Log.log("增量处理 jar： " + jarInput.file.name + " add or change~")
+                }
+                else -> {
+                    return
+                }
+            }
         }
 
         if (destFile.exists()) {
@@ -174,28 +170,26 @@ abstract class BaseTransform protected constructor(val project: Project) : Trans
         val destDirPath = dest.absolutePath
         val temporaryDir = context.temporaryDir
         FileUtils.forceMkdir(dest)
+        // 增量编译
         if (isIncremental) {
-            val changedFilesMap = directoryInput.changedFiles
-            for (mutableEntry in changedFilesMap) {
-                val classFile = mutableEntry.key
-                when (mutableEntry.value) {
-                    Status.NOTCHANGED -> {
-//                        continue
+            directoryInput.changedFiles.forEach { map ->
+                val classFile = map.key
+                when (map.value) {
+                    Status.NOTCHANGED -> {}
+                    Status.ADDED, Status.CHANGED -> {
+                        Log.log("增量处理 class： " + classFile.absoluteFile + " 添加 or 改变～")
+                        modifyClassFile(classFile, srcDirPath, destDirPath, temporaryDir)
                     }
                     Status.REMOVED -> {
-                        Log.log("处理 class： " + classFile.absoluteFile + " REMOVED")
+                        Log.log("增量处理 class： " + classFile.absoluteFile + " 删除～")
                         //最终文件应该存放的路径
                         val destFilePath = classFile.absolutePath.replace(srcDirPath, destDirPath)
                         val destFile = File(destFilePath)
                         if (destFile.exists()) {
                             destFile.delete()
                         }
-//                        continue
                     }
-                    Status.ADDED, Status.CHANGED -> {
-                        Log.log("处理 class： " + classFile.absoluteFile + " ADDED or CHANGED")
-                        modifyClassFile(classFile, srcDirPath, destDirPath, temporaryDir)
-                    }
+
                     else -> {
 //                        continue
                     }
@@ -270,28 +264,22 @@ abstract class BaseTransform protected constructor(val project: Project) : Trans
         }
     }
 
-    private fun submitTask(task: () -> Unit) {
-//        taskList.add(Callable<Unit> {
-        task()
-//        })
-    }
-
     override fun getInputTypes(): Set<QualifiedContent.ContentType> {
         return TransformManager.CONTENT_CLASS
     }
 
     override fun getScopes(): MutableSet<in QualifiedContent.Scope> = when {
         // transformers.isEmpty() -> mutableSetOf()
-        project.plugins.hasPlugin("com.android.library") -> TransformManager.PROJECT_ONLY
         project.plugins.hasPlugin("com.android.application") -> TransformManager.SCOPE_FULL_PROJECT
         project.plugins.hasPlugin("com.android.dynamic-feature") -> TransformManager.SCOPE_FULL_WITH_FEATURES
+        project.plugins.hasPlugin("com.android.library") -> TransformManager.PROJECT_ONLY
         else -> TODO("Not an Android project")
     }
 
     override fun getReferencedScopes(): MutableSet<in QualifiedContent.Scope> = when {
-        project.plugins.hasPlugin("com.android.library") -> TransformManager.PROJECT_ONLY
         project.plugins.hasPlugin("com.android.application") -> TransformManager.SCOPE_FULL_PROJECT
         project.plugins.hasPlugin("com.android.dynamic-feature") -> TransformManager.SCOPE_FULL_WITH_FEATURES
+        project.plugins.hasPlugin("com.android.library") -> TransformManager.PROJECT_ONLY
         else -> super.getReferencedScopes()
     }
 

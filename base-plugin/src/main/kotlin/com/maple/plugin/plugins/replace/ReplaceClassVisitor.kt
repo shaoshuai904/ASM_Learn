@@ -8,20 +8,34 @@ import org.objectweb.asm.Opcodes
 /**
  * 代码行替换
  */
-class ReplaceClassVisitor(cv: ClassVisitor) : ClassVisitor(Opcodes.ASM5, cv), Opcodes {
+class ReplaceClassVisitor(
+    cv: ClassVisitor,
+    val configs: List<ReplaceBean>
+) : ClassVisitor(Opcodes.ASM5, cv), Opcodes {
     private var mClassName: String = ""
-    private val replaceBeans = ReplaceConfig.getReplaceBeans()
 
-    override fun visit(version: Int, access: Int, name: String, signature: String?, superName: String, interfaces: Array<String>?) {
-        // 51 - 33 - androidx/fragment/app/FragmentActivity - null - androidx/activity/ComponentActivity
+    override fun visit(
+        version: Int, // 51
+        access: Int,  // 33
+        name: String, // androidx/fragment/app/FragmentActivity
+        signature: String?,
+        superName: String, // androidx/activity/ComponentActivity
+        interfaces: Array<String>?
+    ) {
         mClassName = name
         super.visit(version, access, name, signature, superName, interfaces)
     }
 
-    override fun visitMethod(access: Int, name: String, desc: String, signature: String?, exceptions: Array<String>?): MethodVisitor {
+    override fun visitMethod(
+        access: Int,  // 4
+        name: String, // onCreate
+        desc: String, // (Landroid/os/Bundle;)V
+        signature: String?,
+        exceptions: Array<String>?
+    ): MethodVisitor {
         // 4 - onCreate - (Landroid/os/Bundle;)V - null
         // Log.e("MS_ASM", "visitMethod:$access - $name - $desc - $signature")
-        val replace = replaceBeans.find {
+        val replace = configs.find {
             mClassName == it.newOwner && name == it.newName
         }
         val vm = super.visitMethod(access, name, desc, signature, exceptions)
@@ -38,7 +52,7 @@ class ReplaceClassVisitor(cv: ClassVisitor) : ClassVisitor(Opcodes.ASM5, cv), Op
      */
     private fun getReplaceMethodVisitor(vm: MethodVisitor) = object : MethodVisitor(Opcodes.ASM5, vm) {
         override fun visitMethodInsn(opcode: Int, owner: String?, name: String?, descriptor: String?, isInterface: Boolean) {
-            val bean = replaceBeans.find {
+            val bean = configs.find {
                 it.isSameOldConfig(opcode, owner, name, descriptor, isInterface)
             }
             if (bean != null) {
@@ -48,7 +62,7 @@ class ReplaceClassVisitor(cv: ClassVisitor) : ClassVisitor(Opcodes.ASM5, cv), Op
                 // BroadcastUtils.sendAppInsideBroadcast(ctx, intent);
                 // 184 - com/gavin/asmdemo/BroadcastUtils - sendAppInsideBroadcast - (Landroid/content/Context;Landroid/content/Intent;)V - false
                 Log.e("MS_ASM", "执行替换: $opcode - $owner - $name - $descriptor - $isInterface")
-                super.visitMethodInsn(bean.newOpcode, bean.newOwner, bean.newName, bean.newDescriptor, bean.isNewIsInterface)
+                super.visitMethodInsn(bean.getNewOpcodeInt(), bean.newOwner, bean.newName, bean.newDescriptor, bean.newIsInterface)
             } else {
                 super.visitMethodInsn(opcode, owner, name, descriptor, isInterface)
             }

@@ -1,20 +1,17 @@
 package com.maple.plugin.plugins.replace
 
-import org.objectweb.asm.Opcodes
-
-object ReplaceConfig {
+object TestData {
 
     @JvmStatic
     fun getReplaceBeans(): List<ReplaceBean> {
         return listOf(
             ReplaceBean(
-                Opcodes.INVOKEVIRTUAL,
+                "INVOKEVIRTUAL",
                 "android/content/Context",
                 "sendBroadcast",
                 "(Landroid/content/Intent;)V",
-                false
-            ).setNewCodeConfig(
-                Opcodes.INVOKESTATIC,
+                false,
+                "INVOKESTATIC",
                 "com/maple/asm_learn/BroadcastUtils",
                 "sendAppInsideBroadcast",
                 "(Landroid/content/Context;Landroid/content/Intent;)V",

@@ -2,11 +2,7 @@ package com.maple.plugin.utils
 
 import java.io.File
 
-/**
- * @Author: leavesCZY
- * @Date: 2021/12/4 17:40
- * @Desc:
- */
+
 object ClassUtils {
 
     private fun isAndroidGeneratedClass(className: String): Boolean {

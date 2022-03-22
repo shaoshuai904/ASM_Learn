@@ -1,5 +1,8 @@
 package com.maple.asm_learn
 
+import android.app.Activity
+import android.content.Intent
+
 /**
  * 度量衡换算工具类
  *
@@ -33,4 +36,8 @@ object ConversionUtils {
         return "${String.format("%.2f", curSize)} ${unitList[curUnit]}"
     }
 
+    fun toSecondPage(activity: Activity){
+        val intent = Intent(activity,SecondActivity::class.java)
+        activity.startActivity(intent)
+    }
 }
