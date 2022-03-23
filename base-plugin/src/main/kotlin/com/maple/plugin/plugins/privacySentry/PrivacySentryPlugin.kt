@@ -23,9 +23,7 @@ class PrivacySentryPlugin : Plugin<Project> {
             config.transform()
         }
         val appExtension: AppExtension = project.extensions.getByType(AppExtension::class.java)
-        appExtension.registerTransform(
-            PrivacySentryTransform(project, PrivacySentryConfig())
-        )
+        appExtension.registerTransform(PrivacySentryTransform(project, PrivacySentryConfig()))
     }
 
 }

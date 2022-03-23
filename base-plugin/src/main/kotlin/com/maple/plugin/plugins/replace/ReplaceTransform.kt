@@ -4,6 +4,7 @@ import com.android.build.api.transform.TransformInvocation
 import com.google.gson.Gson
 import com.maple.plugin.BaseTransform
 import com.maple.plugin.extension.ReplaceExtension
+import com.maple.plugin.plugins.addLog.AddLogClassVisitor
 import com.maple.plugin.utils.Log
 import org.gradle.api.Project
 import org.objectweb.asm.ClassReader
@@ -29,8 +30,13 @@ class ReplaceTransform(project: Project) : BaseTransform(project) {
         val classReader = ClassReader(byteArray)
         val className = classReader.className
         if ("com/maple/asm_learn/MainActivity" == className) {
+//            val cw = ClassWriter(classReader, ClassWriter.COMPUTE_MAXS)
+//            val visitor = ReplaceClassVisitor(cw, replaceBeans!!)
+//            classReader.accept(visitor, ClassReader.EXPAND_FRAMES)
+//            return cw.toByteArray()
+//        } else if ("androidx/appcompat/app/FragmentActivity" == className) {
             val cw = ClassWriter(classReader, ClassWriter.COMPUTE_MAXS)
-            val visitor = ReplaceClassVisitor(cw, replaceBeans!!)
+            val visitor = AddLogClassVisitor(cw)
             classReader.accept(visitor, ClassReader.EXPAND_FRAMES)
             return cw.toByteArray()
         }

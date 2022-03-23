@@ -11,7 +11,7 @@ if ("true" == project.findProperty('enableASMPlugin')) {
         uuid = "ms_methodmap"
         replace {
             enable = true
-            configFile = "gradle/replaceConfig.json"
+            configFile = "res/replaceConfig.json"
         }
     }
 }

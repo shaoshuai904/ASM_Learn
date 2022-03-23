@@ -33,12 +33,17 @@ abstract class BaseTransform protected constructor(val project: Project) : Trans
         val startTime = System.currentTimeMillis()
         Log.log("transform start--------------->")
         onTransformStart()
-        val outputProvider = invocation.outputProvider
         val context = invocation.context
+        // 管理输出路径，如果消费型输入为空，你会发现OutputProvider == null
+        val outputProvider = invocation.outputProvider
+        // 是否增量编译
         val isIncremental = invocation.isIncremental && this.isIncremental
         if (!isIncremental) {
             outputProvider.deleteAll()
         }
+        // 引用型输入，无需输出。
+        // invocation.referencedInputs.forEach {  }
+        // 消费型输入，可以从中获取jar包和class文件夹路径。需要输出给下一个任务
         invocation.inputs.forEach { input ->
             input.jarInputs.forEach { jarInput ->
                 submitTask {
@@ -189,17 +194,13 @@ abstract class BaseTransform protected constructor(val project: Project) : Trans
                             destFile.delete()
                         }
                     }
-
-                    else -> {
-//                        continue
-                    }
+                    else -> {}
                 }
             }
         } else {
-            directoryInput.file.walkTopDown().filter { it.isFile }
-                .forEach { classFile ->
-                    modifyClassFile(classFile, srcDirPath, destDirPath, temporaryDir)
-                }
+            directoryInput.file.walkTopDown().filter { it.isFile }.forEach { classFile ->
+                modifyClassFile(classFile, srcDirPath, destDirPath, temporaryDir)
+            }
         }
     }
 
@@ -222,7 +223,7 @@ abstract class BaseTransform protected constructor(val project: Project) : Trans
         } else {
             null
         }
-        //将修改结果保存到目标路径
+        // 将修改结果保存到目标路径
         FileUtils.copyFile(modifyClassFile ?: classFile, destFile)
         modifyClassFile?.delete()
     }
