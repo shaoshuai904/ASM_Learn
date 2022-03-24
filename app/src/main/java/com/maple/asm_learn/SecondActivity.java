@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 public class SecondActivity extends BaseActivity {
+    public static final String TAG = "Second";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -13,6 +14,24 @@ public class SecondActivity extends BaseActivity {
         setContentView(R.layout.activity_second);
         Log.e("MS_ASM", "SecondActivity中的onCreate");
         testMe();
+
+        Throwable throwable = new Throwable();
+
+        Log.i(TAG, "onCreate");
+        Log.i(TAG, "onCreate", throwable);
+
+        Log.d(TAG, "onCreate");
+        Log.d(TAG, "onCreate", throwable);
+
+        Log.v(TAG, "onCreate");
+        Log.v(TAG, "onCreate", throwable);
+
+        Log.e(TAG, "onCreate");
+        Log.e(TAG, "onCreate", throwable);
+
+        Log.w(TAG, "onCreate");
+        Log.w(TAG, "onCreate", throwable);
+        Log.w(TAG, throwable);
     }
 
     public int testMe() {
@@ -26,7 +45,7 @@ public class SecondActivity extends BaseActivity {
     public void testSendBC(Context ctx) {
         Intent intent = new Intent();
         ctx.sendBroadcast(intent);
-        Log.e("ms_app","testSendBC");
+        Log.e("ms_app", "testSendBC");
         ctx.sendBroadcast(new Intent("com.sina.weibo.intent.action.ACTION_HOME_LIST_UPDATE"));
     }
 

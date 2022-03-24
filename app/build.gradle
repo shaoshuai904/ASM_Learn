@@ -15,6 +15,16 @@ if ("true" == project.findProperty('enableASMPlugin')) {
         }
     }
 }
+if ("true" == project.findProperty('enableMsKit')) {
+    apply plugin: 'com.maple.mskit'
+    msKitExt {
+        uuid = "ms_methodmap"
+        replace {
+            enable = true
+            configFile = "res/replaceConfig.json"
+        }
+    }
+}
 
 
 android {

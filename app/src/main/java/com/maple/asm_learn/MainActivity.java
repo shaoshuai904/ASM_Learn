@@ -1,5 +1,6 @@
 package com.maple.asm_learn;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -44,6 +45,22 @@ public class MainActivity extends BaseActivity {
         ctx.sendBroadcast(new Intent("com.sina.weibo.intent.action.ACTION_HOME_LIST_UPDATE"));
 //        long countTime = System.currentTimeMillis() - startTime;
 //        Log.e("MS_ASM","方法耗时："+countTime);
+    }
+
+
+    public void testPadding(Context ctx) {
+        Intent intent = new Intent();
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+//        if (android.os.Build.VERSION.SDK_INT >= 31) {
+//            final int FLAG_MUTABLE = 1 << 25;// PendingIntent.FLAG_MUTABLE
+//            flags = flags | FLAG_MUTABLE;
+//        }
+
+        PendingIntent appIntent = PendingIntent.getActivity(ctx, 0, intent, flags);
+
+        PendingIntent pendintent = PendingIntent.getService(ctx, -1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(ctx, 0, intent, flags);
     }
 
 }
