@@ -1,7 +1,5 @@
 package com.maple.plugin.plugins.replace
 
-import com.android.build.api.transform.TransformException
-import com.android.build.api.transform.TransformInvocation
 import com.google.gson.Gson
 import com.maple.plugin.base.BaseWeaver
 import com.maple.plugin.base.HunterTransform
@@ -11,7 +9,6 @@ import org.gradle.api.Project
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.ClassWriter
 import java.io.File
-import java.io.IOException
 
 class ReplaceTransform(project: Project) : HunterTransform(project) {
     private var replaceBeans: List<ReplaceBean>? = null
@@ -22,7 +19,7 @@ class ReplaceTransform(project: Project) : HunterTransform(project) {
 
     init {
         // project.extensions.create(configTag, LineLogExtension::class.java)
-        Log.log("调用 init: $config ")
+        // Log.log("调用 init: $config ")
         bytecodeWeaver = object : BaseWeaver() {
             override fun isWeavableClass(filePath: String): Boolean {
                 return super.isWeavableClass(filePath)
@@ -35,13 +32,11 @@ class ReplaceTransform(project: Project) : HunterTransform(project) {
         }
     }
 
-    @Throws(IOException::class, TransformException::class, InterruptedException::class)
-    override fun transform(invocation: TransformInvocation) {
+    override fun onTransformStart() {
         Log.log("调用 transform: $config")
         // config = project.extensions.getByName(configTag) as LineLogExtension
         replaceBeans = getReplaceConfig(project, config.configFile)
-        bytecodeWeaver.setExtension(replaceBeans)
-        super.transform(invocation)
+        // bytecodeWeaver.setExtension(replaceBeans)
     }
 
     override fun getRunVariant(): RunVariant {

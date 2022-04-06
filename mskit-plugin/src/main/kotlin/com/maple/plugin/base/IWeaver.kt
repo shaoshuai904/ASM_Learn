@@ -8,7 +8,7 @@ import java.io.InputStream
  */
 interface IWeaver {
     /**
-     * Check a certain file is weavable
+     * 检查一个文件是否需要修改字节码 Check a certain file is weavable
      * @param filePath class路径
      * @return 是否需要修改字节码
      */
@@ -21,20 +21,3 @@ interface IWeaver {
     @Throws(IOException::class)
     fun weaveSingleClassToByteArray(inputStream: InputStream): ByteArray?
 }
-
-// public interface IWeaver {
-//
-//    /**
-//     * Check a certain file is weavable
-//     * @param filePath class路径
-//     * @return 是否需要修改字节码
-//     */
-//    public boolean isWeavableClass(String filePath) throws IOException;
-//
-//    /**
-//     * Weave single class to byte array
-//     */
-//    public byte[] weaveSingleClassToByteArray(InputStream inputStream) throws IOException;
-//
-//
-//}

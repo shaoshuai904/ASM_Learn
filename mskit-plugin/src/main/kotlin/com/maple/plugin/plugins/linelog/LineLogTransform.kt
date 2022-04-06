@@ -23,10 +23,9 @@ class LineLogTransform(project: Project) : HunterTransform(project) {
         project.extensions.create(configTag, LineLogExtension::class.java)
         bytecodeWeaver = object : BaseWeaver() {
             override fun isWeavableClass(filePath: String): Boolean {
-                val superResult = super.isWeavableClass(filePath)
                 Log.log("isWeavableClass: $filePath")
-                val isByteCodePlugin = "com.maple.asm_learn.LineNumberLog.class" != filePath
-                return superResult && isByteCodePlugin
+                return super.isWeavableClass(filePath)
+                        && ("com.maple.asm_learn.LineNumberLog.class" != filePath)
             }
 
             override fun wrapClassWriter(classWriter: ClassWriter): ClassVisitor {

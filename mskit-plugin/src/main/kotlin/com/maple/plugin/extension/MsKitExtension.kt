@@ -20,10 +20,13 @@ open class MsKitExtension(
     }
 
     override fun toString(): String {
-        return " uuid:$uuid  replace:$replace logLevel:$logLevel"
+        return " uuid:$uuid  logLevel:$logLevel \nreplace:$replace "
     }
 }
 
+/**
+ * 运行模式
+ */
 enum class RunVariant {
     DEBUG,  // debug 运行
     RELEASE,  // release 运行

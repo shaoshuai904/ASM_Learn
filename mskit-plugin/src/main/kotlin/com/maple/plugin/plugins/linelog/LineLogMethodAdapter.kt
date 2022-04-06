@@ -1,7 +1,5 @@
 package com.maple.plugin.plugins.linelog
 
-import com.android.build.gradle.internal.LoggerWrapper
-import com.maple.plugin.plugins.linelog.LineLogMethodAdapter
 import org.objectweb.asm.Label
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
@@ -13,7 +11,7 @@ class LineLogMethodAdapter(mv: MethodVisitor?) : MethodVisitor(Opcodes.ASM7, mv)
     private var lineNumber = 0
 
     companion object {
-        private val logger = LoggerWrapper.getLogger(LineLogMethodAdapter::class.java)
+        // private val logger = LoggerWrapper.getLogger(LineLogMethodAdapter::class.java)
         private const val mOwner = "com/maple/asm_learn/LineNumberLog"
     }
 

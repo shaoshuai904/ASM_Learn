@@ -29,7 +29,7 @@ class MsKitPlugin : Plugin<Project> {
         // 获取 build.gradle 文件中的配置信息
         val extension = project.extensions.create("msKitExt", MsKitExtension::class.java)
         project.afterEvaluate {
-            Log.log("调用 afterEvaluate:")
+            Log.log("调用 afterEvaluate: $extension")
             ReplaceTransform.config = extension.replace
         }
 

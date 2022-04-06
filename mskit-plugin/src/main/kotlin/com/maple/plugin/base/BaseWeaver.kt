@@ -85,6 +85,7 @@ open class BaseWeaver : IWeaver {
         }
         outputZip.flush()
         outputZip.close()
+        inputZip.close()
     }
 
     @Throws(IOException::class)
@@ -114,6 +115,5 @@ open class BaseWeaver : IWeaver {
             }
         }
     }
-
 
 }

@@ -15,35 +15,6 @@ import java.net.URLClassLoader
  */
 object ClassLoaderHelper {
 
-
-    //    public static URLClassLoader getClassLoader(
-    //            Collection<TransformInput> inputs,
-    //            Collection<TransformInput> referencedInputs,
-    //            Project project
-    //    ) throws MalformedURLException {
-    //        ImmutableList.Builder<URL> urls = new ImmutableList.Builder<>();
-    //        String androidJarPath = getAndroidJarPath(project);
-    //        File file = new File(androidJarPath);
-    //        URL androidJarURL = file.toURI().toURL();
-    //        urls.add(androidJarURL);
-    //        for (TransformInput totalInputs : Iterables.concat(inputs, referencedInputs)) {
-    //            for (DirectoryInput directoryInput : totalInputs.getDirectoryInputs()) {
-    //                if (directoryInput.getFile().isDirectory()) {
-    //                    urls.add(directoryInput.getFile().toURI().toURL());
-    //                }
-    //            }
-    //            for (JarInput jarInput : totalInputs.getJarInputs()) {
-    //                if (jarInput.getFile().isFile()) {
-    //                    urls.add(jarInput.getFile().toURI().toURL());
-    //                }
-    //            }
-    //        }
-    //        ImmutableList<URL> allUrls = urls.build();
-    //        URL[] classLoaderUrls = allUrls.toArray(new URL[0]);
-    //        return new URLClassLoader(classLoaderUrls);
-    //    }
-
-
     @Throws(MalformedURLException::class)
     fun getClassLoader(
         inputs: Collection<TransformInput>?,
@@ -70,24 +41,12 @@ object ClassLoaderHelper {
         return URLClassLoader(classLoaderUrls)
     }
 
-    //    /**
-    //     * /Users/quinn/Documents/Android/SDK/platforms/android-28/android.jar
-    //     */
-    //    private static String getAndroidJarPath(Project project) {
-    //        AppExtension appExtension = (AppExtension) project.getProperties().get("android");
-    //        String sdkDirectory = appExtension.getSdkDirectory().getAbsolutePath();
-    //        String compileSdkVersion = appExtension.getCompileSdkVersion();
-    //        sdkDirectory = sdkDirectory + File.separator + "platforms" + File.separator;
-    //        return sdkDirectory + compileSdkVersion + File.separator + "android.jar";
-    //    }
-
     /**
      * /Users/quinn/Documents/Android/SDK/platforms/android-28/android.jar
      */
     private fun getAndroidJarPath(project: Project): String {
-        val appExtension = project.properties["android"] as AppExtension?
-        var sdkDirectory = appExtension!!.sdkDirectory.absolutePath
-        sdkDirectory = sdkDirectory + File.separator + "platforms" + File.separator
-        return sdkDirectory + appExtension.compileSdkVersion!! + File.separator + "android.jar"
+        val appExtension = project.properties["android"] as AppExtension
+        val sdkDirectory = appExtension.sdkDirectory.absolutePath + File.separator + "platforms" + File.separator
+        return sdkDirectory + appExtension.compileSdkVersion + File.separator + "android.jar"
     }
 }

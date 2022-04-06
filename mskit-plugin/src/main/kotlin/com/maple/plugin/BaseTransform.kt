@@ -166,10 +166,8 @@ abstract class BaseTransform protected constructor(val project: Project) : Trans
         val dir = directoryInput.file
         Log.log("处理dir： " + dir.absolutePath)
         val dest = outputProvider.getContentLocation(
-            directoryInput.name,
-            directoryInput.contentTypes,
-            directoryInput.scopes,
-            Format.DIRECTORY
+            directoryInput.name, directoryInput.contentTypes,
+            directoryInput.scopes, Format.DIRECTORY
         )
         val srcDirPath = dir.absolutePath
         val destDirPath = dest.absolutePath
@@ -198,7 +196,7 @@ abstract class BaseTransform protected constructor(val project: Project) : Trans
                 }
             }
         } else {
-            directoryInput.file.walkTopDown().filter { it.isFile }.forEach { classFile ->
+            dir.walkTopDown().filter { it.isFile }.forEach { classFile ->
                 modifyClassFile(classFile, srcDirPath, destDirPath, temporaryDir)
             }
         }
@@ -212,8 +210,7 @@ abstract class BaseTransform protected constructor(val project: Project) : Trans
     ) {
         // Log.log("处理 class： " + classFile.absoluteFile)
         //最终文件应该存放的路径
-        val destFilePath = classFile.absolutePath.replace(srcDirPath, destDirPath)
-        val destFile = File(destFilePath)
+        val destFile = File(classFile.absolutePath.replace(srcDirPath, destDirPath))
         if (destFile.exists()) {
             destFile.delete()
         }
