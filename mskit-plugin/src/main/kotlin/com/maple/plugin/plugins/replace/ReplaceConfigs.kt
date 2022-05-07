@@ -21,6 +21,8 @@ data class ReplaceConfigs(
     var configs: List<ReplaceBean>
 ) : Serializable {
     var version: Int = 1
+
+    fun getEnableConfigs() = configs.filter { it.enable }
 }
 
 /**
@@ -36,7 +38,8 @@ data class ReplaceBean(
     var newOwner: String?,
     var newName: String?,
     var newDescriptor: String?,
-    var newIsInterface: Boolean
+    var newIsInterface: Boolean,
+    var enable: Boolean
 ) : Serializable {
 
     fun isSameOldConfig(opcode: Int, owner: String?, name: String?, descriptor: String?, isInterface: Boolean): Boolean {

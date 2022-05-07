@@ -46,20 +46,20 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-    public File getTempDirForSDcard(Context context) {
-        File dirtyFile = new File(String.format(Locale.US, "%s/%s_%020d%s", "logDir", "placeholderPrefix", new Date().getTime() * 1000 + getNextUnique(), "placeholderDirtySuffix"));
-        Log.e("ms_app", "testFile" + dirtyFile.getName());
-
-
-        // -----------------
-        File var10000;
-        File var4;
-        var10000 = var4 = new File("/shared_prefs/push_notify_flag.xml");
-        if (var10000.exists()) {
-            Log.e("ms_app", "testFile" + var4.getName());
-        }
-        return new File("fasd");
-    }
+//    public File getTempDirForSDcard(Context context) {
+//        File dirtyFile = new File(String.format(Locale.US, "%s/%s_%020d%s", "logDir", "placeholderPrefix", new Date().getTime() * 1000 + getNextUnique(), "placeholderDirtySuffix"));
+//        Log.e("ms_app", "testFile" + dirtyFile.getName());
+//
+//
+//        // -----------------
+//        File var10000;
+//        File var4;
+//        var10000 = var4 = new File("/shared_prefs/push_notify_flag.xml");
+//        if (var10000.exists()) {
+//            Log.e("ms_app", "testFile" + var4.getName());
+//        }
+//        return new File("fasd");
+//    }
 
     private int getNextUnique() {
         return 99;
@@ -83,8 +83,8 @@ public class MainActivity extends BaseActivity {
 //                new File("fadsfadsgadfdasfsdaf"));
 
 
-        File parent = new File(getTempDirForSDcard(MsApplication.getWBApplicationContext()) + "/" + Environment
-                .DIRECTORY_DCIM + "/weibo");
+//        File parent = new File(getTempDirForSDcard(MsApplication.getWBApplicationContext()) + "/" + Environment
+//                .DIRECTORY_DCIM + "/weibo");
 
 //        BroadcastUtils.createFile("fa");
         MsBean aa = BroadcastUtils.createMsBean("", 423);

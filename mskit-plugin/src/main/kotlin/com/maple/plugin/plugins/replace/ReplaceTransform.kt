@@ -69,8 +69,9 @@ class ReplaceTransform(project: Project) : HunterTransform(project) {
         // println("[ms_plugin]===>: configJson: $jsonStr")
         if (jsonStr.isNotEmpty()) {
             val rc: ReplaceConfigs = Gson().fromJson(jsonStr, ReplaceConfigs::class.java)
-            //Log.log("configs: $rc")
-            return rc.configs
+            val configs = rc.getEnableConfigs()
+            //Log.log("配置文件内容: $configs")
+            return configs
         }
         return null
     }
