@@ -4,17 +4,20 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        maven { url "http://artifactory.client.weibo.cn/artifactory/ext-release-local/" }
+        maven { url "http://artifactory.client.weibo.cn/artifactory/android_virtual_libs/" }
+        maven { url 'http://developer.huawei.com/repo/' }
         maven { url uri('./local-plugin') }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:4.1.0"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        if ("true" == project.findProperty('enableReplace')) {
-            classpath 'com.maple.plugin:replace-plugin:0.0.1'
-        }
-        if ("true" == project.findProperty('enableASMPlugin')) {
-            classpath 'com.maple.plugin:base-plugin:0.0.1'
-        }
+//        if ("true" == project.findProperty('enableReplace')) {
+//            classpath 'com.maple.plugin:replace-plugin:0.0.1'
+//        }
+//        if ("true" == project.findProperty('enableASMPlugin')) {
+//            classpath 'com.maple.plugin:base-plugin:0.0.1'
+//        }
         if ("true" == project.findProperty('enableMsKit')) {
             classpath 'com.maple.plugin:mskit-plugin:0.0.1'
         }
@@ -27,6 +30,9 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        maven { url "http://artifactory.client.weibo.cn/artifactory/ext-release-local/" }
+        maven { url "http://artifactory.client.weibo.cn/artifactory/android_virtual_libs/" }
+        maven { url 'http://developer.huawei.com/repo/' }
         // gradlePluginPortal()
         // jcenter() // Warning: this repository is going to shut down soon
     }

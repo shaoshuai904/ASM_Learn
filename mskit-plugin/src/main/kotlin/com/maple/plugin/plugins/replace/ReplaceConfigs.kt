@@ -51,9 +51,10 @@ data class ReplaceBean(
         }
     }
 
+    fun getOldOpcodeInt() = convertOpcode(oldOpcode)
     fun getNewOpcodeInt() = convertOpcode(newOpcode)
 
-    private fun convertOpcode(code: String?): Int = when (code) {
+    fun convertOpcode(code: String?): Int = when (code) {
         "INVOKEVIRTUAL", "virtual" -> Opcodes.INVOKEVIRTUAL // visitMethodInsn
         "INVOKESPECIAL", "special" -> Opcodes.INVOKESPECIAL
         "INVOKESTATIC", "static" -> Opcodes.INVOKESTATIC

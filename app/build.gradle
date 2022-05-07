@@ -2,19 +2,19 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 //com.maple.lifecycle 为resources/META-INF/gradle-plugins 下的properties文件名称
-if (project.hasProperty('enableReplace')) {
-    apply plugin: 'com.maple.replace'
-}
-if ("true" == project.findProperty('enableASMPlugin')) {
-    apply plugin: 'com.maple.msplugin'
-    msKitExt {
-        uuid = "ms_methodmap"
-        replace {
-            enable = true
-            configFile = "res/replaceConfig.json"
-        }
-    }
-}
+//if (project.hasProperty('enableReplace')) {
+//    apply plugin: 'com.maple.replace'
+//}
+//if ("true" == project.findProperty('enableASMPlugin')) {
+//    apply plugin: 'com.maple.msplugin'
+//    msKitExt {
+//        uuid = "ms_methodmap"
+//        replace {
+//            enable = true
+//            configFile = "res/replaceConfig.json"
+//        }
+//    }
+//}
 if ("true" == project.findProperty('enableMsKit')) {
     apply plugin: 'com.maple.mskit'
     msKitExt {
@@ -59,11 +59,13 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.3.0'
     implementation 'com.google.android.material:material:1.4.0'
+//    implementation 'com.huawei.hms:push:5.0.4.302'
+//    implementation 'com.sina.weibo.lib:aqts:2.3.0.1@aar'
+//    implementation "androidx.core:core-ktx:1.6.0"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-//    implementation "androidx.core:core-ktx:1.6.0"
 }
 
 repositories {

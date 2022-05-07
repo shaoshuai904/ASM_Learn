@@ -11,7 +11,8 @@
       "newOwner": "com/maple/asm_learn/BroadcastUtils",
       "newName": "sendAppInsideBroadcast",
       "newDescriptor": "(Landroid/content/Context;Landroid/content/Intent;)V",
-      "newIsInterface": false
+      "newIsInterface": false,
+      "enable": true
     },
     {
       "oldOpcode": "INVOKESTATIC",
@@ -23,7 +24,47 @@
       "newOwner": "com/maple/asm_learn/BroadcastUtils",
       "newName": "getActivity",
       "newDescriptor": "(Landroid/content/Context;ILandroid/content/Intent;I)Landroid/app/PendingIntent;",
-      "newIsInterface": false
+      "newIsInterface": false,
+      "enable": true
+    },
+    {
+      "oldOpcode": "INVOKESPECIAL",
+      "oldOwner": "java/io/File",
+      "oldName": "<init>",
+      "oldDescriptor": "(Ljava/lang/String;)V",
+      "oldIsInterface": false,
+      "newOpcode": "INVOKESTATIC",
+      "newOwner": "com/maple/asm_learn/BroadcastUtils",
+      "newName": "createFile",
+      "newDescriptor": "(Ljava/lang/String;)Ljava/io/File;",
+      "newIsInterface": false,
+      "enable": true
+    },
+    {
+      "oldOpcode": "INVOKESPECIAL",
+      "oldOwner": "java/io/File",
+      "oldName": "<init>",
+      "oldDescriptor": "(Ljava/io/File;Ljava/lang/String;)V",
+      "oldIsInterface": false,
+      "newOpcode": "INVOKESTATIC",
+      "newOwner": "com/maple/asm_learn/BroadcastUtils",
+      "newName": "createFile",
+      "newDescriptor": "(Ljava/io/File;Ljava/lang/String;)Ljava/io/File;",
+      "newIsInterface": false,
+      "enable": true
+    },
+    {
+      "oldOpcode": "INVOKESPECIAL",
+      "oldOwner": "com/maple/asm_learn/MsBean",
+      "oldName": "<init>",
+      "oldDescriptor": "(Ljava/lang/String;I)V",
+      "oldIsInterface": false,
+      "newOpcode": "INVOKESTATIC",
+      "newOwner": "com/maple/asm_learn/BroadcastUtils",
+      "newName": "createMsBean",
+      "newDescriptor": "(Ljava/lang/String;I)Lcom/maple/asm_learn/MsBean;",
+      "newIsInterface": false,
+      "enable": true
     }
   ]
 }

@@ -2,6 +2,7 @@ package com.maple.asm_learn
 
 import android.app.Activity
 import android.content.Intent
+import java.io.File
 
 /**
  * 度量衡换算工具类
@@ -11,6 +12,11 @@ import android.content.Intent
  */
 object ConversionUtils {
     private val unitList = arrayOf("B", "KB", "MB", "GB", "TB", "PB", "EB")
+
+    fun aaa() {
+        val file: File = File("fadb")
+    }
+
 
     fun convertB(B: Long?) = convertSize(B?.toDouble(), 0)
     fun convertB(B: Double?) = convertSize(B, 0)
@@ -36,8 +42,8 @@ object ConversionUtils {
         return "${String.format("%.2f", curSize)} ${unitList[curUnit]}"
     }
 
-    fun toSecondPage(activity: Activity){
-        val intent = Intent(activity,SecondActivity::class.java)
+    fun toSecondPage(activity: Activity) {
+        val intent = Intent(activity, SecondActivity::class.java)
         activity.startActivity(intent)
     }
 }

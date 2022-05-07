@@ -1,5 +1,5 @@
 rootProject.name = "ASM_Learn"
 include ':app'
-include ':replace-plugin'
-include ':base-plugin'
+//include ':replace-plugin'
+//include ':base-plugin'
 include ':mskit-plugin'

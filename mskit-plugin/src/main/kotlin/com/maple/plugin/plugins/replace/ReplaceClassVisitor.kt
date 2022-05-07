@@ -2,7 +2,6 @@ package com.maple.plugin.plugins.replace
 
 import com.maple.plugin.utils.Log
 import org.objectweb.asm.ClassVisitor
-import org.objectweb.asm.Label
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
 
@@ -12,7 +11,7 @@ import org.objectweb.asm.Opcodes
 class ReplaceClassVisitor(
     cv: ClassVisitor,
     val configs: List<ReplaceBean>?
-) : ClassVisitor(Opcodes.ASM5, cv), Opcodes {
+) : ClassVisitor(Opcodes.ASM7, cv), Opcodes {
     private var mClassName: String = ""
 
     override fun visit(version: Int, access: Int, name: String, signature: String?, superName: String, interfaces: Array<String>?) {
@@ -32,35 +31,9 @@ class ReplaceClassVisitor(
             Log.log("跳过原方法: ${newMethod.newOwner} - ${newMethod.newName} - ${newMethod.newDescriptor}")
             vm
         } else {
-            getReplaceMethodVisitor(vm)
-        }
-    }
-
-    /**
-     * 替换方法体中某一行代码
-     */
-    private fun getReplaceMethodVisitor(vm: MethodVisitor) = object : MethodVisitor(Opcodes.ASM5, vm) {
-        private var lineNumber = 0
-        override fun visitLineNumber(line: Int, start: Label?) {
-            lineNumber = line
-            super.visitLineNumber(line, start)
-        }
-
-        override fun visitMethodInsn(opcode: Int, owner: String?, name: String?, descriptor: String?, isInterface: Boolean) {
-            val bean = configs?.find {
-                it.isSameOldConfig(opcode, owner, name, descriptor, isInterface)
-            }
-            if (bean != null) {
-                // ctx.sendBroadcast(intent);
-                // 182 - android/content/Context - sendBroadcast - (Landroid/content/Intent;)V - false
-
-                // BroadcastUtils.sendAppInsideBroadcast(ctx, intent);
-                // 184 - com/gavin/asmdemo/BroadcastUtils - sendAppInsideBroadcast - (Landroid/content/Context;Landroid/content/Intent;)V - false
-                Log.log("执行替换: $mClassName : $lineNumber \n $opcode - $owner - $name - $descriptor")
-                super.visitMethodInsn(bean.getNewOpcodeInt(), bean.newOwner, bean.newName, bean.newDescriptor, bean.newIsInterface)
-            } else {
-                super.visitMethodInsn(opcode, owner, name, descriptor, isInterface)
-            }
+//            LogMethodVisitor(vm)
+            ReplaceMethodVisitor(vm, configs, mClassName)
+            // ReplaceMethodVisitor2(vm, configs, mClassName)
         }
     }
 

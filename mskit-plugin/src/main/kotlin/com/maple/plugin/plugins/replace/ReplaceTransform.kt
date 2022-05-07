@@ -23,7 +23,10 @@ class ReplaceTransform(project: Project) : HunterTransform(project) {
         bytecodeWeaver = object : BaseWeaver() {
             override fun isWeavableClass(filePath: String): Boolean {
                 return super.isWeavableClass(filePath)
-                        && ("com.maple.asm_learn.LineNumberLog.class" != filePath)
+//                        && ("com.huawei.hms.support.api.push.utils.CommFun.class" == filePath)
+//                        && ("com.huawei.hms.support.api.push.PushProvider.class" == filePath)
+                        && ("com.maple.asm_learn.MainActivity.class" == filePath)
+//                        && ("com.maple.asm_learn.LineNumberLog.class" != filePath)
             }
 
             override fun wrapClassWriter(classWriter: ClassWriter): ClassVisitor {
@@ -33,14 +36,19 @@ class ReplaceTransform(project: Project) : HunterTransform(project) {
     }
 
     override fun onTransformStart() {
-        Log.log("调用 transform: $config")
+        // Log.log("调用 transform: $config")
         // config = project.extensions.getByName(configTag) as LineLogExtension
         replaceBeans = getReplaceConfig(project, config.configFile)
         // bytecodeWeaver.setExtension(replaceBeans)
     }
 
+    override fun onTransformEnd() {
+        val logs = LogFileUtils.toLogString()
+        Log.log("操作记录：$logs")
+    }
+
     override fun getRunVariant(): RunVariant {
-        Log.log("调用 getRunVariant : ${replaceBeans?.size} ~")
+        // Log.log("调用 getRunVariant : ${replaceBeans?.size} ~")
         if (replaceBeans.isNullOrEmpty()) {
             return RunVariant.NEVER
         }
@@ -61,7 +69,7 @@ class ReplaceTransform(project: Project) : HunterTransform(project) {
         // println("[ms_plugin]===>: configJson: $jsonStr")
         if (jsonStr.isNotEmpty()) {
             val rc: ReplaceConfigs = Gson().fromJson(jsonStr, ReplaceConfigs::class.java)
-            Log.log("configs: $rc")
+            //Log.log("configs: $rc")
             return rc.configs
         }
         return null

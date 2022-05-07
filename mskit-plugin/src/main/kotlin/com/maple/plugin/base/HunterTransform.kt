@@ -8,7 +8,6 @@ import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
 import java.io.File
 import java.io.IOException
-import java.util.concurrent.Callable
 
 /**
  * Transform to modify bytecode
@@ -77,29 +76,29 @@ open class HunterTransform(
         flagForCleanDexBuilderFolder = false
         invocation.inputs.forEach { input ->
             input.jarInputs.forEach { jarInput ->
-                submitTask {
-                    forEachJar(outputProvider, jarInput, isIncremental)
-                }
+//                submitTask {
+                forEachJar(outputProvider, jarInput, isIncremental)
+//                }
             }
             input.directoryInputs.forEach { dirInput ->
-                submitTask {
-                    forEachDir(outputProvider, dirInput, isIncremental)
-                }
+//                submitTask {
+                forEachDir(outputProvider, dirInput, isIncremental)
+//                }
             }
         }
-        worker.await()
+//        worker.await()
         onTransformEnd()
         val costTime = System.currentTimeMillis() - startTime
         Log.log("$name costed: $costTime ms")
     }
 
-    private var worker: Worker = Schedulers.IO()
-    private fun submitTask(task: () -> Unit) {
-        worker.submit(Callable<Any?> {
-            task()
-            null
-        })
-    }
+    //    private var worker: Worker = Schedulers.IO()
+//    private fun submitTask(task: () -> Unit) {
+//        worker.submit(Callable<Any?> {
+//        task()
+//            null
+//        })
+//    }
 
     @Throws(IOException::class)
     private fun forEachDir(outputProvider: TransformOutputProvider, directoryInput: DirectoryInput, isIncremental: Boolean) {

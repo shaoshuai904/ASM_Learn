@@ -16,6 +16,12 @@ val buildVersion: Revision
 
 inline fun <reified T : BaseExtension> Project.getAndroid(): T = extensions.getByName("android") as T
 
+fun Project.isReleaseTask(): Boolean {
+    return gradle.startParameter.taskNames.any {
+        it.contains("release") || it.contains("Release")
+    }
+}
+
 @Suppress("UNCHECKED_CAST")
 fun <T> Project.getProperty(name: String, defaultValue: T): T {
     val value = findProperty(name) ?: return defaultValue

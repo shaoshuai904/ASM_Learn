@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import java.io.File;
+
 public class BroadcastUtils {
 
     public static void sendAppInsideBroadcast(Context ctx, Intent intent) {
@@ -23,6 +25,24 @@ public class BroadcastUtils {
             flags = flags | FLAG_MUTABLE;
         }
         return PendingIntent.getActivity(context, requestCode, intent, flags);
+    }
+
+    public static File createFile(String name) {
+        File file = new File("new_" + name);
+        Log.e("ms_app", "createFile " + file.getName());
+        return file;
+    }
+
+    public static File createFile(File f, String name) {
+        File file = new File(f, "new_" + name);
+        Log.e("ms_app", "createFile " + file.getName());
+        return file;
+    }
+
+    public static MsBean createMsBean(String name, int age) {
+        MsBean msa = new MsBean("lisi" + name, 2333);
+        Log.e("ms_app", "createMsBean " + msa.toString());
+        return msa;
     }
 
 }
