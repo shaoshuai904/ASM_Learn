@@ -141,14 +141,14 @@ class ReplaceMethodVisitor(
      * ...
      * visitMethodInsn: INVOKESPECIAL, java/io/File, <init>, (Ljava/lang/String;)V, false
      */
-    private fun isNewDupStore(steps: List<List<Any?>>): Boolean {
-        return steps.size >= 3
-                && "visitTypeInsn" == (steps[0][0] as String)
-                && Opcodes.NEW == (steps[0][1] as Int)
-                && "visitInsn" == (steps[1][0] as String)
-                && Opcodes.DUP == (steps[1][1] as Int)
-                && "visitVarInsn" == (steps[2][0] as String)
-                && Opcodes.ASTORE == (steps[2][1] as Int)
+    private fun isNewDupStore(steps: List<List<Any?>>, start: Int = 0): Boolean {
+        return steps.size >= start + 3
+                && "visitTypeInsn" == (steps[start][0] as String)
+                && Opcodes.NEW == (steps[start][1] as Int)
+                && "visitInsn" == (steps[start + 1][0] as String)
+                && Opcodes.DUP == (steps[start + 1][1] as Int)
+                && "visitVarInsn" == (steps[start + 2][0] as String)
+                && Opcodes.ASTORE == (steps[start + 2][1] as Int)
     }
 
     /**
@@ -160,16 +160,16 @@ class ReplaceMethodVisitor(
      * <p>...
      * <p>visitMethodInsn: 183, java/io/File, <init>, (Ljava/lang/String;)V, false
      */
-    private fun isNewDupDupStore(steps: List<List<Any?>>): Boolean {
-        return steps.size >= 4
-                && "visitTypeInsn" == (steps[0][0] as String)
-                && Opcodes.NEW == (steps[0][1] as Int)
-                && "visitInsn" == (steps[1][0] as String)
-                && Opcodes.DUP == (steps[1][1] as Int)
-                && "visitInsn" == (steps[2][0] as String)
-                && Opcodes.DUP == (steps[2][1] as Int)
-                && "visitVarInsn" == (steps[3][0] as String)
-                && Opcodes.ASTORE == (steps[3][1] as Int)
+    private fun isNewDupDupStore(steps: List<List<Any?>>, start: Int = 0): Boolean {
+        return steps.size >= start + 4
+                && "visitTypeInsn" == (steps[start][0] as String)
+                && Opcodes.NEW == (steps[start][1] as Int)
+                && "visitInsn" == (steps[start + 1][0] as String)
+                && Opcodes.DUP == (steps[start + 1][1] as Int)
+                && "visitInsn" == (steps[start + 2][0] as String)
+                && Opcodes.DUP == (steps[start + 2][1] as Int)
+                && "visitVarInsn" == (steps[start + 3][0] as String)
+                && Opcodes.ASTORE == (steps[start + 3][1] as Int)
     }
 
     /**
@@ -206,7 +206,7 @@ class ReplaceMethodVisitor(
 
 
     // 查找存储的所有指令里，是需要替换的New方法的个数
-    private fun findStepsNeedReplaceNewNumber(): Int {
+    private fun findStepsNeedReplaceNewNumber(steps: ArrayList<List<Any?>>): Int {
         // 查找 同类型、同类、同方法名 的所有指令 (重载方法)
         val beans: List<ReplaceBean>? = configs?.filter {
             "INVOKESPECIAL" == it.oldOpcode// "INVOKESPECIAL"
@@ -274,10 +274,11 @@ class ReplaceMethodVisitor(
             // 可能需要替换，（参数不一致的也放进来了）
             // (INVOKESPECIAL, "java/io/File", "<init>", "(Ljava/lang/String;)V", false)
             val bean = beans.find { descriptor == it.oldDescriptor }
+            val newOwnerName = if ("<init>" == name) owner else ""
             if (bean == null) {
                 // 参数不一致，重载方法，不做替换
                 addStep("visitMethodInsn", opcode, owner, name, descriptor, isInterface)
-                checkWriteSteps(false)
+                checkWriteSteps(newOwnerName)
             } else {
                 // 参数一致，就是目标方法
                 LogFileUtils.addLog("$opcode - $owner - $name - $descriptor", "$mClassName : $lineNumber")
@@ -288,7 +289,7 @@ class ReplaceMethodVisitor(
                 // 184 - com/gavin/asmdemo/BroadcastUtils - sendAppInsideBroadcast - (Landroid/content/Context;Landroid/content/Intent;)V - false
                 addStep("visitMethodInsn", bean.getNewOpcodeInt(), bean.newOwner, bean.newName, bean.newDescriptor, bean.newIsInterface)
                 // 目标new方法
-                checkWriteSteps("<init>" == name)
+                checkWriteSteps(newOwnerName)
             }
         } else {
             if (findInitMethod) {
@@ -300,71 +301,202 @@ class ReplaceMethodVisitor(
     }
 
     /**
+     * 查找 newOwnerName 的第 findIndex 个New指令的索引
+     */
+    private fun findNewIndexOf(newOwnerName: String?, findIndex: Int): Int {
+        val findNew = arrayListOf("visitTypeInsn", Opcodes.NEW, newOwnerName)
+        var curFind = 0
+        steps.forEachIndexed { index, step ->
+            if (step == findNew) {
+                curFind++
+                if (curFind == findIndex) {
+                    return index
+                }
+            }
+        }
+        return -1
+    }
+
+    /**
      * 将存储的指令 重新写入。
      */
-    private fun checkWriteSteps(isTargetNew: Boolean) {
-        val newSize = findStepsNeedReplaceNewNumber()
+    private fun checkWriteSteps(newOwnerName: String? = "") {
+        val newSize = findStepsNeedReplaceNewNumber(steps)
         Log.log("检查栈内New方法个数： $newSize ")
         when {
             // 内含多个需要替换的构造方法
-            newSize > 1 -> {
-                findInitMethod = false
-                steps.forEach { step -> writeSingleStep(step) }
-                steps.clear()
-            }
-            // 只有一个需要替换的构造方法，简单处理
-            newSize == 1 -> {
-                if (!isTargetNew) {
-                    // 参数不一致的，构造方法
-                    // (INVOKESPECIAL, "java/io/File", "<init>", "(Ljava/lang/String;)V", false)
-                    val curStep = steps.last()
+            newSize > 0 -> {
+                var saveNewSize = 0
+                var saveInitSize = 0
+                steps.forEach {
+                    // visitTypeInsn(NEW, "java/io/File")
+                    // visitMethodInsn(INVOKESPECIAL, "java/io/File", "<init>", "(Ljava/lang/String;)V", false)
                     if (
-                        "visitMethodInsn" == curStep[0]
-                        && Opcodes.INVOKESPECIAL == curStep[1]
-                        && steps.first()[2] == curStep[2]
-                        && "<init>" == curStep[3]
+                        "visitTypeInsn" == it[0]
+                        && Opcodes.NEW == it[1]
+                        && newOwnerName == it[2]
                     ) {
-                        // 检查存储集合 最后一条，如果是 误伤new, 此时的new dup 原封不动，保存 回写
+                        saveNewSize++
+                    } else if (
+                        "visitMethodInsn" == it[0]
+                        && Opcodes.INVOKESPECIAL == it[1]
+                        && newOwnerName == it[2]
+                        && "<init>" == it[3]
+                    ) {
+                        saveInitSize++
+                    }
+                }
+                // 如果 new 和 init 正好配对，此时 剩下的new 都是 不需要替换的。完整写入即可
+                Log.log("此时saveNewSize:$saveNewSize , saveInitSize:$saveInitSize")
+                if (saveNewSize == saveInitSize) {
+                    Log.log("完美互消，重新写入~ ")
+                    findInitMethod = false
+                    steps.forEach { step -> writeSingleStep(step) }
+                    steps.clear()
+                } else {
+                    // 需要替换, 查找 第 new-init 个 new dup, 消除
+                    val findNewIndex = findNewIndexOf(newOwnerName, saveNewSize - saveInitSize)
+                    val jumpNum = when {
+                        isNewDupStore(steps, findNewIndex) -> 3
+                        isNewDupDupStore(steps, findNewIndex) -> 4
+                        else -> 2
+                    }
+                    val tempSteps = arrayListOf<List<Any?>>()
+                    steps.forEachIndexed { index, step ->
+                        if (index in findNewIndex until findNewIndex + jumpNum) {
+                            // 去除目标操作
+                            Log.log("+++去除：$index : $step")
+                        } else {
+                            Log.log("+++添加：$step")
+                            tempSteps.add(step)
+                        }
+                    }
+                    if (jumpNum == 4) {
+                        // visitInsn: DUP
+                        // visitVarInsn: ASTORE, 3
+                        Log.log("+++添加：${steps[findNewIndex + 2]}")
+                        tempSteps.add(steps[findNewIndex + 2])
+                        Log.log("+++添加：${steps[findNewIndex + 2]}")
+                        tempSteps.add(steps[findNewIndex + 3])
+                    }
+                    steps.clear()
+                    steps.addAll(tempSteps)
+                    if (findStepsNeedReplaceNewNumber(steps) == 0) {
                         findInitMethod = false
                         steps.forEach { step ->
-                            Log.log("误伤回写：$step")
+                            Log.log("普通回写：$step")
                             writeSingleStep(step)
                         }
                         steps.clear()
                     }
+                }
+                /*
+                if (newOwnerName.isNullOrEmpty()) {
+                    // 参数不一致的，构造方法
+                    // 检查存储集合 最后一条，如果是 误伤new, 此时的new dup 原封不动，保存 回写
+                    var newInitSize = 0
+                    val newOwner = steps.first()[2]
+                    steps.forEach {
+                        // visitTypeInsn(NEW, "java/io/File")
+                        // visitMethodInsn(INVOKESPECIAL, "java/io/File", "<init>", "(Ljava/lang/String;)V", false)
+                        if (
+                            "visitTypeInsn" == it[0]
+                            && Opcodes.NEW == it[1]
+                            && newOwner == it[2]
+                        ) {
+                            Log.log("一个new~ ")
+                            newInitSize++
+                        } else if (
+                            "visitMethodInsn" == it[0]
+                            && Opcodes.INVOKESPECIAL == it[1]
+                            && newOwner == it[2]
+                            && "<init>" == it[3]
+                        ) {
+                            Log.log("一个init~ ")
+                            newInitSize--
+                        }
+                    }
+                    // 完美互消
+                    if (newInitSize == 0) {
+                        Log.log("完美互消，重新写入~ ")
+                        findInitMethod = false
+                        steps.forEach { step -> writeSingleStep(step) }
+                        steps.clear()
+                    }
                 } else {
-                    // val addSteps = arrayListOf<List<Any?>>()
-                    var doubleDupStore = -1
-                    var jumpNum = 2
-                    if (isNewDupStore(steps)) {
-                        //addSteps.add(steps[2])
-                        jumpNum = 3
-                    }
-                    if (isNewDupDupStore(steps)) {
-                        //addSteps.add(steps[2])
-                        //addSteps.add(steps[3])
-                        jumpNum = 4
-                        doubleDupStore = steps[3][2] as Int
-                    }
-                    findInitMethod = false
+                    // 需要替换, 查找最后一个new dup,消除
+                    // visitTypeInsn(NEW, "java/io/File");
+                    val findNew = arrayListOf("visitTypeInsn", Opcodes.NEW, newOwnerName)
+                    val lastIndex = steps.lastIndexOf(findNew)
+                    // steps.removeRange(2,3)
+                    val tempSteps = arrayListOf<List<Any?>>()
                     steps.forEachIndexed { index, step ->
-                        if (index < jumpNum) {
+                        if (index in lastIndex..lastIndex + 1) {
                             // 去除目标操作
-                            Log.log("去除：$index : $step")
+                            Log.log("+++去除：$index : $step")
                         } else {
-                            Log.log("写入：$step")
-                            writeSingleStep(step)
+                            Log.log("+++添加：$step")
+                            tempSteps.add(step)
                         }
                     }
                     steps.clear()
-                    if (doubleDupStore != -1) {
-                        // visitInsn: DUP
-                        // visitVarInsn: ASTORE, 3
-                        writeSingleStep(arrayListOf("visitInsn", Opcodes.DUP))
-                        writeSingleStep(arrayListOf("visitVarInsn", Opcodes.ASTORE, doubleDupStore))
-                    }
+                    steps.addAll(tempSteps)
                 }
+                */
             }
+            // 只有一个需要替换的构造方法，简单处理
+//            newSize == 1 -> {
+//                if (newOwnerName.isNullOrEmpty()) {
+//                    // 参数不一致的，构造方法
+//                    // (INVOKESPECIAL, "java/io/File", "<init>", "(Ljava/lang/String;)V", false)
+//                    val curStep = steps.last()
+//                    if (
+//                        "visitMethodInsn" == curStep[0]
+//                        && Opcodes.INVOKESPECIAL == curStep[1]
+//                        && steps.first()[2] == curStep[2]
+//                        && "<init>" == curStep[3]
+//                    ) {
+//                        // 检查存储集合 最后一条，如果是 误伤new, 此时的new dup 原封不动，保存 回写
+//                        findInitMethod = false
+//                        steps.forEach { step ->
+//                            Log.log("误伤回写：$step")
+//                            writeSingleStep(step)
+//                        }
+//                        steps.clear()
+//                    }
+//                } else {
+//                    // val addSteps = arrayListOf<List<Any?>>()
+//                    var doubleDupStore = -1
+//                    var jumpNum = 2
+//                    if (isNewDupStore(steps)) {
+//                        //addSteps.add(steps[2])
+//                        jumpNum = 3
+//                    }
+//                    if (isNewDupDupStore(steps)) {
+//                        //addSteps.add(steps[2])
+//                        //addSteps.add(steps[3])
+//                        jumpNum = 4
+//                        doubleDupStore = steps[3][2] as Int
+//                    }
+//                    findInitMethod = false
+//                    steps.forEachIndexed { index, step ->
+//                        if (index < jumpNum) {
+//                            // 去除目标操作
+//                            Log.log("去除：$index : $step")
+//                        } else {
+//                            Log.log("写入：$step")
+//                            writeSingleStep(step)
+//                        }
+//                    }
+//                    steps.clear()
+//                    if (doubleDupStore != -1) {
+//                        // visitInsn: DUP
+//                        // visitVarInsn: ASTORE, 3
+//                        writeSingleStep(arrayListOf("visitInsn", Opcodes.DUP))
+//                        writeSingleStep(arrayListOf("visitVarInsn", Opcodes.ASTORE, doubleDupStore))
+//                    }
+//                }
+//            }
             // 没有需要构造方法
             else -> {
                 findInitMethod = false

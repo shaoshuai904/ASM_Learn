@@ -18,9 +18,9 @@ import java.util.Locale;
 public class MainActivity extends BaseActivity {
     private ActivityMainBinding binding;
 
-    private static final String SAVE_REAL_PATH = new File(GifEmotionUtils.isAdaptationRFileEnable() ?
-            GifEmotionUtils.checkAndCreateNameSpace(MsApplication.instance) :
-            GifEmotionUtils.getSDPath(), "LONG_PIC_SHARE_SUB_DIR").getAbsolutePath();
+//    private static final String SAVE_REAL_PATH = new File(GifEmotionUtils.isAdaptationRFileEnable() ?
+//            GifEmotionUtils.checkAndCreateNameSpace(MsApplication.instance) :
+//            GifEmotionUtils.getSDPath(), "LONG_PIC_SHARE_SUB_DIR").getAbsolutePath();
 
 
 //    public MainActivity() {
@@ -60,16 +60,23 @@ public class MainActivity extends BaseActivity {
 //        }
 //        return new File("fasd");
 //    }
+//
+//    private int getNextUnique() {
+//        return 99;
+//    }
 
-    private int getNextUnique() {
-        return 99;
-    }
-
-//    public File renameTo(File file, File file2) {
-//        File fff = new File(new File(new File(getBasePath() + "fasdffadf"), getBasePath() + "abcdef" + 5), getBasePath() + "fasd");
+    public File renameTo(File file, File file2) {
+        File fff =
+                new File(
+                        new File(
+                                new File(getBasePath() + "fasdffadf"),
+                                getBasePath() + "abcdef" + 5),
+                        getBasePath() + "fasd"
+                );
 //        Log.e("ms_app", "testFile" + fff.getName());
 //        return fff;
-//    }
+        return new File("fasd");
+    }
 
     public String getBasePath() {
         return "base_";
@@ -81,13 +88,13 @@ public class MainActivity extends BaseActivity {
 //
 //        renameTo(new File("fasdfa"),
 //                new File("fadsfadsgadfdasfsdaf"));
-
-
+//
+//
 //        File parent = new File(getTempDirForSDcard(MsApplication.getWBApplicationContext()) + "/" + Environment
 //                .DIRECTORY_DCIM + "/weibo");
-
+//
 //        BroadcastUtils.createFile("fa");
-        MsBean aa = BroadcastUtils.createMsBean("", 423);
+//        MsBean aa = BroadcastUtils.createMsBean("", 423);
 
         new MsBean("zhangsan");
         MsBean msa = new MsBean(

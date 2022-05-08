@@ -38,7 +38,7 @@
       "newName": "createFile",
       "newDescriptor": "(Ljava/lang/String;)Ljava/io/File;",
       "newIsInterface": false,
-      "enable": true
+      "enable": false
     },
     {
       "oldOpcode": "INVOKESPECIAL",
